@@ -1,2 +1,5 @@
+#!/bin/bash
 git add .
-git commit -am "initial commit"
+git commit -a
+git push -u origin master
+echo "$Name"
