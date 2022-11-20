@@ -44,7 +44,7 @@ chisq.test(Partition$counts, p=Probabilities)
 ```{r}
 pchisq(5.9441, 6, lower.tail = FALSE)
 ```
-As we can see from the previous test, the normal distribution model can not be used. We can confirm this data by using the following texts
+As we can see from the previous test, the normal distribution model can be used as the p-value is less than 0.05. We can confirm this data by using the following texts
 
 ```{r}
 library(nortest)

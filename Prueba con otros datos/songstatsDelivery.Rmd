@@ -114,6 +114,7 @@ will use the next block of R:
 
 ```{r}
 SpotifySongs <- read_excel("songstats.xlsx")
+View(SpotifySongs)
 dance <- SpotifySongs$danceability
 energy <- SpotifySongs$energy
 rithm <- SpotifySongs$rithm
@@ -123,7 +124,7 @@ accous <- SpotifySongs$acousticness
 live <- SpotifySongs$liveness
 valence <- SpotifySongs$valence
 tempo <- SpotifySongs$tempo
-duration <- SpotifySongs$duration_ms
+duration <- SpotifySongs$duration_s
 # Choose best second variable
 cat("Correlation between loud and Danceability\n")
 cor(loud, SpotifySongs$danceability)
@@ -143,8 +144,8 @@ cat("Correlation between loud and valence\n")
 cor(loud, SpotifySongs$valence)
 cat("Correlation between loud and tempo\n")
 cor(loud, tempo)
-cat("Correlation between loud and duration_ms\n")
-# cor(loud, SpotifySongs$duration_ms)
+cat("Correlation between loud and duration_s\n")
+cor(loud, SpotifySongs$duration_s)
 
 cor(loud, energy)
 cor(loud, log10(energy))
