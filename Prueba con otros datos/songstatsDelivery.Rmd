@@ -1,0 +1,214 @@
+---
+title: "First Delivery Statistics"
+author: "Eduardo Alarcón & Alfonso Pineda"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+editor_options:
+  markdown:
+    wrap: 72
+markdown:
+  wrap: 92
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1.Introduction:
+
+The first delivery of the final project of Statistics of the degree of
+Computer Science. In this document, we (Alfonso Pineda and Eduardo
+Alarcón) will be showing the histogram of the main variable we have
+chosen for our project, is the $\textbf{energy}$ of a song, which is a value assigned by the
+spoify algorith to try and categorize songs and if they make people more or less energetic.
+As well, we will have a Box Plot and the statistical Measures on the same block as the histogram, the first one.
+
+On the second block, we will show the $\textbf{rithm}$ of a song which we have tested to be the
+variable that has the most relation with the main variable. We are also going
+to show a Histogram, a Box Plot and the Statistical Measurements.
+
+Lastly, we will show the Scatter Plot and the Linear Model between the energy and the loudness
+
+
+# 1st Block:
+
+Including the data from the excel: The first thing we need to do is
+import the data we are going to work with.
+
+```{r}
+library(readxl)
+SpotifySongs <- read_excel("songstats.xlsx")
+View(SpotifySongs)
+```
+
+### Histogram Then, we need to create the histogram, using R
+
+```{r, out.height='70%'}
+SpotifySongs <- read_excel("songstats.xlsx")
+energy <- SpotifySongs$energy
+hist(energy, xlab = "transmited energy of the songs over 1000",
+     main = "Energy provided by songs")
+
+```
+
+We have also created the histogram differentiating if the artist is a
+Male, Female, Band or Collaboration between different artists (we used
+different colors to view them):
+
+```{r}
+# {r, fig.height = 4, fig.width = 6}
+
+suppressWarnings(library(ggplot2))
+SpotifySongs$participants <- "Male"
+SpotifySongs$participants[SpotifySongs$GenderGroup == "F"] <- "Female"
+SpotifySongs$participants[SpotifySongs$GenderGroup == "Band"] <- "Band"
+SpotifySongs$participants[SpotifySongs$GenderGroup == "Colab"] <- "Colaboration"
+
+qplot(energy, data=SpotifySongs, geom=c("histogram"), fill=participants, 
+      alpha=I(.65), main="Distribution of the participants with respect to the energy", 
+      xlab="energy", ylab="Frequency", bins=20)
+#Use bins=num to set the number of intervals
+
+```
+
+### Boxplot
+
+Then, we also need to create a Box Plot:
+
+```{r}
+#{r, fig.height = 4, fig.width = 5}
+boxplot(energy, ylab = "energy of a song", 
+        main = "Boxplot")
+```
+
+As we can see from the Box Plot there are some extreme outliers. 
+
+We can see from the Box Plot that the Histogram is not symmetric at all.
+
+### Statistical Measures
+
+Now, it's time for us to calculate the statistical measures of the main
+variable, $\textbf{energy}$ These measures are: the $\underline{mean}$, the $\underline{median}$,
+the $\underline{mode}$, the $\underline{percentiles}$, the $\underline{range}$, the $\underline{variance}$, and the $\underline{standard deviation}$.
+
+First, we need to store the variable as Data in R, then, we ask R to
+describe the variable, which outputs the measures we need, as well as
+the number of elements there are, in this case N: 167
+
+```{r message=FALSE, warning=FALSE}
+energy<-SpotifySongs$energy
+suppressWarnings(library(summarytools))
+# Describe the variable energy
+descr(energy)
+```
+
+
+# 2nd Block:
+
+On this second part we will test which of the variables we have on our
+study has the best correlation with the main variable. To asses this, we
+will use the next block of R:
+
+```{r}
+SpotifySongs <- read_excel("songstats.xlsx")
+dance <- SpotifySongs$danceability
+energy <- SpotifySongs$energy
+rithm <- SpotifySongs$rithm
+loud <- SpotifySongs$loudness
+speech <- SpotifySongs$speechiness
+accous <- SpotifySongs$acousticness
+live <- SpotifySongs$liveness
+valence <- SpotifySongs$valence
+tempo <- SpotifySongs$tempo
+duration <- SpotifySongs$duration_ms
+# Choose best second variable
+cat("Correlation between loud and Danceability\n")
+cor(loud, SpotifySongs$danceability)
+cat("Correlation between loud and energy\n")
+cor(loud, SpotifySongs$energy)
+cat("Correlation between loud and rithm\n")
+cor(loud, SpotifySongs$rithm)
+cat("Correlation between loud and Loudness\n")
+cor(loud, SpotifySongs$loudness)
+cat("Correlation between loud and speechiness\n")
+cor(loud, SpotifySongs$speechiness)
+cat("Correlation between loud and acousticness\n")
+cor(loud, SpotifySongs$acousticness)
+cat("Correlation between loud and liveness\n")
+cor(loud, SpotifySongs$liveness)
+cat("Correlation between loud and valence\n")
+cor(loud, SpotifySongs$valence)
+cat("Correlation between loud and tempo\n")
+cor(loud, tempo)
+cat("Correlation between loud and duration_ms\n")
+# cor(loud, SpotifySongs$duration_ms)
+
+cor(loud, energy)
+cor(loud, log10(energy))
+cor(energy, rithm)
+
+#The best correlation found is: Energy & Loudness, with a correlation of 0.8125021
+
+```
+
+
+With the previous results, we choose the variable $\underline{rithm}$
+These are the statistical variables of the rithm, as well as the Histogram and Box Plot:
+
+```{r}
+SpotifySongs <- read_excel("songstats.xlsx")
+rithm<-SpotifySongs$rithm
+descr(rithm)
+```
+
+```{r}
+# Histogram/Box-Plot of the secondary variable
+hist(rithm)
+boxplot(rithm, horizontal = TRUE)
+```
+
+
+# 3rd Block:
+
+On the last block, we will see the Scatter Plot and Linear Model between
+the main variable, the tempo and the speechiness
+
+```{r}
+# Scatter plot without linear model of tempo and speechiness
+plot(
+    rithm,
+    energy, 
+    xlab = "Rithm",
+    ylab = "Energy",
+    col.lab = "gray19",
+    col="skyblue3"
+)
+```
+
+## Scatter Plot with the Linear Model:
+
+The scatter plot created with the $log_{10}$ of the energy is:
+
+```{r}
+#energy <- log(energy)
+energy <- SpotifySongs$energy
+rithm <- SpotifySongs$rithm
+plot(
+    rithm,
+    energy,
+    xlab = "Rithm",
+    ylab = "Energy",
+    col="skyblue3",
+)
+RegressionModel <- lm(energy~ rithm, data=SpotifySongs)
+abline(lm(energy ~ rithm), col="tomato3")
+RegressionModel
+print(RegressionModel)
+summary(RegressionModel)
+```
+
+
+

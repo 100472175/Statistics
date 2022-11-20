@@ -1,0 +1,216 @@
+---
+title: "First Delivery Statistics"
+author: "Eduardo Alarcón & Alfonso Pineda"
+date: "`r Sys.Date()`"
+output: pdf_document
+editor_options: 
+  markdown: 
+    wrap: 72
+markdown: 
+    wrap: 82
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1.Introduction:
+
+The first delivery of the final project of Statistics of the degree of
+Computer Science. In this document, we (Alfonso Pineda and Eduardo
+Alarcón) will be showing the histogram of the main variable we have
+chosen for our project, namely percentWeeksOnChart, which represents the
+% of weeks with respect to a year the song has been on the top chart. As
+well, we will have a Box Plot and the statistical Measures on the same
+block as the histogram, the first one.
+
+On the second block, we will show the "loudness" which we think is the
+one that has the most relation with the main variable. We are also going
+to show a Histogram, a Box Plot and the Statistical Measurements.
+
+Lastly, we will show the Scatter Plot and the Linear Model
+
+\newpage
+
+# 1st Block:
+
+Including the data from the excel: The first thing we need to do is
+import the data we are going to work with.
+
+```{r}
+library(readxl)
+SpotifySongs <- read_excel("spotistats.xlsx")
+View(SpotifySongs)
+```
+
+### Histogram Then, we need to create the histogram, using R
+
+```{r, out.height='70%'}
+hist(SpotifySongs$percentWeeksOnChart, xlab = "% Of the year on Top charts",
+     main = "% Of weeks a song is on the charts with respect to a year")
+
+```
+
+We have also created the histogram differentiating if the artist is a
+Male, Female, Band or Collaboration between different artists (we used
+different colors to view them):
+
+```{r, fig.height = 4, fig.width = 6}
+
+suppressWarnings(library(ggplot2))
+SpotifySongs$people <- "Male"
+SpotifySongs$people[SpotifySongs$GenderGroup == "F"] <- "Female"
+SpotifySongs$people[SpotifySongs$GenderGroup == "Band"] <- "Band"
+SpotifySongs$people[SpotifySongs$GenderGroup == "Colab"] <- "Colaboration"
+
+qplot(percentWeeksOnChart, data=SpotifySongs, geom=c("histogram"), fill=people, 
+      alpha=I(.65), main="Distribution people in top chartsr", 
+      xlab="percentWeeksOnChart", ylab="Frequency")
+
+```
+
+## Boxplot
+
+Then, we also need to create a Box Plot:
+
+```{r, fig.height = 4, fig.width = 5}
+boxplot(SpotifySongs$percentWeeksOnChart, ylab = "% Of weeks on top charts with respect to a year", 
+        main = "Boxplot")
+```
+
+As we can see from the Box Plot there are some extreme outliers and
+indicate that some of the songs stay on the top charts for significant
+more time than the rest of songs.
+
+We can see from the Box Plot that the Histogram is not symmetric at all.
+
+# Statistical Measures
+
+Now, it's time for us to calculate the statistical measures of the main
+variable, percentWeeksOnChart. These measures are: the mean, the median,
+the mode, the percentiles, the range, the variance, and the standard
+deviation.
+
+First, we need to store the variable as Data in R, then, we ask R to
+describe the variable, which outputs the measures we need, as well as
+the number of elements there are, in this case N: 100
+
+```{r message=FALSE, warning=FALSE}
+weeksonchart<-SpotifySongs$percentWeeksOnChart
+suppressWarnings(library(summarytools))
+# Describe the variable weeksonchart
+descr(weeksonchart)
+```
+
+\newpage
+
+# 2nd Block:
+
+On this second part we will test which of the variables we have on our
+study has the best correlation with the main variable. To asses this, we
+will use the next block of R:
+
+```{r}
+# Choose best second variable
+# Correlation between percentWeeksOnChart and Danceability\n"
+cor(SpotifySongs$percentWeeksOnChart, SpotifySongs$Danceability)
+# Correlation between percentWeeksOnChart and Duration\n"
+cor(SpotifySongs$percentWeeksOnChart, SpotifySongs$Duration)
+# Correlation between percentWeeksOnChart and Loudness\n"
+cor(SpotifySongs$percentWeeksOnChart, SpotifySongs$Loudness)
+```
+
+With the previous results, we choose the variable Loudness. Here are the
+statistical variables of the Loudness, as well as the Histogram and Box
+Plot:
+
+```{r}
+loudness<-SpotifySongs$Loudness
+descr(loudness)
+```
+
+```{r}
+# Histogram/Box-Plot of the secondary variable
+hist(loudness)
+boxplot(loudness, horizontal = TRUE)
+```
+
+As we can see from the box plot and the histogram, this distribution is
+more symmetrical than our main variable.
+
+\newpage
+
+# 3rd Block:
+
+On the last block, we will see the Scatter Plot and Linear Model between
+the main variable, the percentWeeksOnChart and the loudness.
+
+```{r}
+# Scatter plot without linear model of percentWeeksOnChart and Loudness
+plot(
+    SpotifySongs$Loudness, # We could also use loudness
+    SpotifySongs$percentWeeksOnChart, 
+    xlab = "Loudness",
+    ylab = "Percentage weeks",
+    col.lab = "gray19",
+    col="skyblue3"
+)
+```
+\newpage
+
+## Scatter Plot with the Linear Model:
+
+The scatter plot created with the Loudness is:
+
+```{r}
+
+RegressionModel <- lm(percentWeeksOnChart ~ Loudness, data=SpotifySongs)
+print(RegressionModel)
+
+plot(
+    SpotifySongs$Loudness,
+    SpotifySongs$percentWeeksOnChart,
+    xlab = "Loudness",
+    ylab = "Percentage weeks",
+    col="skyblue3"
+)
+abline(RegressionModel, col="tomato3")
+
+
+```
+
+
+As we have not been able to create a valid regression model, 
+
+We have to choose another variabel, as there is no sufficient correlation between them. 
+
+```{r}
+library(readxl)
+
+#Import data
+datos_statistics <- read_excel("spotistats.xlsx")
+
+#Choose best second variable
+cat("Correlation between percentWeeksOnChart and Danceability\n")
+cat(cor(datos_statistics$percentWeeksOnChart, datos_statistics$Danceability))
+
+cat("\n\nCorrelation between percentWeeksOnChart and Duration\n")
+cat(cor(datos_statistics$percentWeeksOnChart, datos_statistics$Duration))
+
+cat("\n\nCorrelation between percentWeeksOnChart and Loudness\n")
+cat(cor(datos_statistics$percentWeeksOnChart, datos_statistics$Loudness))
+
+cor()
+
+#Histogram/Box-Plot of main variable
+hist(datos_statistics$percentWeeksOnChart)
+boxplot(datos_statistics$percentWeeksOnChart, horizontal = TRUE)
+
+#Scatterplot without linear model of percentWeeksOnChart and Loudness
+plot(
+    datos_statistics$Loudness,
+    datos_statistics$percentWeeksOnChart,
+    xlab = "Loudness",
+    ylab = "Percentage weeks"
+)
+```

@@ -1,0 +1,59 @@
+---
+title: "2nd Delivery"
+author: "Eduardo Alarcón & Alfonso Pineda"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+SpotifySongs <- read_excel("songstats.xlsx")
+```
+
+# Model Fitting.
+By just watching the histogram, we can suppose that our main variable, the energy, will follow a normal distribution 
+```{r}
+SpotifySongs <- read_excel("songstats.xlsx")
+suppressWarnings(library(summarytools)) 
+energy <- SpotifySongs$energy
+descr(energy)
+
+hist(energy, probability = TRUE, xlab = "Energy")
+curve(dnorm(x, mean(energy), sd(energy)), col="blue", lwd=2, add=TRUE, yaxt="n")
+```
+
+```{r}
+Partition <- hist(energy, plot=FALSE)
+Partition
+
+library(fitdistrplus)
+normalfit <- fitdist(energy, "norm")
+normalfit
+
+CummulativeProbabilities = pnorm(c(-Inf, Partition$breaks[c(-1, -10)], Inf),
+                                 normalfit$estimate[1], normalfit$estimate[2])
+Probabilities = diff(CummulativeProbabilities)
+Expected = length(energy)*Probabilities
+chisq.test(Partition$counts, p=Probabilities)
+```
+
+```{r}
+pchisq(5.9441, 6, lower.tail = FALSE)
+```
+As we can see from the previous test, the normal distribution model can not be used. We can confirm this data by using the following texts
+
+```{r}
+library(nortest)
+ad.test(energy)
+cvm.test(energy)
+lillie.test(energy)
+pearson.test(energy)
+sf.test(energy)
+plot(normalfit)
+```
+
+

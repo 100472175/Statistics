@@ -1,0 +1,26 @@
+---
+title: "Pruebas"
+author: "Eduardo Alarcón & Alfonso Pineda"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+data<-read_excel("songstats.xlsx")
+hist(data$energy)
+hist(data$danceability)
+hist(data$rithm)
+hist(data$loudness)
+hist(data$speechiness)
+hist(data$acousticness)
+hist(data$liveness)
+hist(data$valence)
+hist(data$tempo)
+hist(data$duration_ms)
+
+```
