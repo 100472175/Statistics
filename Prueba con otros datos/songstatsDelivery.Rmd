@@ -41,7 +41,7 @@ import the data we are going to work with.
 ```{r}
 library(readxl)
 SpotifySongs <- read_excel("songstats.xlsx")
-View(SpotifySongs)
+#View(SpotifySongs)
 ```
 
 ### Histogram Then, we need to create the histogram, using R
@@ -51,7 +51,6 @@ SpotifySongs <- read_excel("songstats.xlsx")
 energy <- SpotifySongs$energy
 hist(energy, xlab = "transmited energy of the songs over 1000",
      main = "Energy provided by songs")
-
 ```
 
 We have also created the histogram differentiating if the artist is a
