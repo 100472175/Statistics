@@ -1,59 +1,66 @@
 ---
-title: "2nd Delivery"
+title: "Hypothesis testing"
 author: "Eduardo Alarcón & Alfonso Pineda"
 date: "`r Sys.Date()`"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r}
 library(readxl)
+knitr::opts_chunk$set(echo = TRUE)
 SpotifySongs <- read_excel("songstats.xlsx")
+View(SpotifySongs)
 ```
 
-# Model Fitting.
-By just watching the histogram, we can suppose that our main variable, the energy, will follow a normal distribution 
+
+
+# Confidence Intervals
+We will perform a unilateral test for the population mean $\mu$ with a large sample. 
+
+We are going to test if the mean ($\mu$) of our population regarding the rithm of the song, the top songs of Spotify, match with the information from the entire dataset of Spotify, which for women is 650 and for men 600
+
+Therefore: 
+$$\begin{array}{ll}
+H_{0}=\mu(\text{female artists})=550 &
+H_{1}=\mu(\text{female artists}) > 550 \\
+H_{0}=\mu(\text{male artists}) = 600 & H_{1}=\mu(\text{male artists}) > 600
+\end{array}$$
+We will start with the female artists:
 ```{r}
-SpotifySongs <- read_excel("songstats.xlsx")
-suppressWarnings(library(summarytools)) 
-energy <- SpotifySongs$energy
-descr(energy)
-
-hist(energy, probability = TRUE, xlab = "Energy")
-curve(dnorm(x, mean(energy), sd(energy)), col="blue", lwd=2, add=TRUE, yaxt="n")
+rithmF <- SpotifySongs$rithmF
+t.test(rithmF, mu=630, alternative="greater")
 ```
-
+Recalculate the P-value:
 ```{r}
-Partition <- hist(energy, plot=FALSE)
-Partition
-
-library(fitdistrplus)
-normalfit <- fitdist(energy, "norm")
-normalfit
-
-CummulativeProbabilities = pnorm(c(-Inf, Partition$breaks[c(-1, -10)], Inf),
-                                 normalfit$estimate[1], normalfit$estimate[2])
-Probabilities = diff(CummulativeProbabilities)
-Expected = length(energy)*Probabilities
-chisq.test(Partition$counts, p=Probabilities)
+pnorm(2.192, lower.tail=FALSE)
 ```
 
-```{r}
-pchisq(5.9441, 6, lower.tail = FALSE)
-```
-As we can see from the previous test, the normal distribution model can be used as the p-value is less than 0.05. We can confirm this data by using the following texts
+As the *p-value* is 0.01746, and even lower when recalculated (0.01418975), we can state that we have sufficient data and evidence to reject the initial hypothesis and take the second hypothesis, resulting in the songs created by female artiss that end up in the top charts on Spotify have a higher rithm than the rest of songs in spotify, including all songs, created by Male artists, Female, Bands and colaborations.
+
+
+Now, we will calculate the hypothesis testing for the male artists, with the same mean, as this number is from the entire charts of spotify
 
 ```{r}
-library(nortest)
-ad.test(energy)
-cvm.test(energy)
-lillie.test(energy)
-pearson.test(energy)
-sf.test(energy)
-plot(normalfit)
+rithmM <- SpotifySongs$rithmM
+t.test(rithmM, mu=630, alternative="greater")
+```
+We obatain a p-value of 0.588, and after recalculating:
+
+```{r}
+pnorm(-0.22364, lower.tail=FALSE)
 ```
 
+we obtain a p-value of 0.5884813, which is extremely high and result, tells us that there is enough evidence to keep the inicial hypotesis. Thus, the mean of the male artist's rithm of the top songs of spotify match with the rithm of the general songs in spotify.
+
+All in all, we can state that the songs created by females artists have a higher rithm than the rest of the songs in spotify with a confidence level of 95%.
+The oposite happens with the male-interpreted songs. We can state that the rithm of a male-interpreted song will be 630 units with a 95% confidence. 
+
+
+```{r}
+hist(rithmF)
+hist(rithmM)
+barplot(rithmF)
+barplot(rithmM)
+
+```
 

@@ -18,29 +18,28 @@ First we read and view the data file. The figure shows the first five observatio
 
 ```{r}
 library(readxl)
-TiempoAccesoWeb <- read_excel("TiempoAccesoWeb.xlsx")
+SpotifySongs <- read_excel("songstats.xlsx")
 ```
-
 
 # 2.1. Univariate analysis of data
 
-Before doing any kind of analysis it is useful to first describe the variables of interest. We start with the access times of the computer at home (variable `Ordenador_Casa`). The numerical and graphical analysis can be performed by
+Before doing any kind of analysis it is useful to first describe the variables of interest. We start with the access times of the computer at home (variable `energy`). The numerical and graphical analysis can be performed by
 
 ```{r message=FALSE, warning=FALSE}
 suppressWarnings(library(summarytools))
-descr(TiempoAccesoWeb$Ordenador_Casa)
-hist(TiempoAccesoWeb$Ordenador_Casa, breaks = seq(5.6, 6.5, .15), 
+descr(SpotifySongs$energy)
+hist(energy, breaks = seq(100, 1000, 50), 
      probability = TRUE, # histogram has a total area = 1
-     xlab = "Ordenador_Casa") 
-curve(dnorm(x, mean(TiempoAccesoWeb$Ordenador_Casa), sd(TiempoAccesoWeb$Ordenador_Casa)), 
+     xlab = "Energy") 
+curve(dnorm(x, mean(energy), sd(energy)), 
       col="blue", lwd=2, add=TRUE, yaxt="n")
 ```
 
-We can notice in the figure that the variable `Ordenador_Casa` has a Normal-liked distribution: it is quite symmetric and bell-shaped. The hypothesis of normality is important to compute the confidence intervals. For example to construct a confidence interval for the variance it is *mandatory* to assume the normality since only in that case we know that the estimator is distributed as a Chi-squared distribution.
+We can notice in the figure that the variable `energy` has a Normal-liked distribution: it is quite symmetric and bell-shaped. The hypothesis of normality is important to compute the confidence intervals. For example to construct a confidence interval for the variance it is *mandatory* to assume the normality since only in that case we know that the estimator is distributed as a Chi-squared distribution.
 
 The summary statistics include measures of central tendency, measures of variability and measures of shape, we can notice that the values of the Skewness and the Kurtosis are quite small confirming the fact that the histogram looks like a Normal distribution.
 
-Among these values, the sample mean and variance are the "point" estimations of the population mean and variance. That is, we have that in this sample, the "point" estimation of the parameters of interest are $\widehat{\mu} = 6.02$ and $\widehat{\sigma}^2 = 0.20^2$.
+Among these values, the sample mean and variance are the "point" estimations of the population mean and variance. That is, we have that in this sample, the "point" estimation of the parameters of interest are $\widehat{\mu} = 660.92$ and $\widehat{\sigma}^2 = 185.68^2$.
 
 *Our objective is to make an “interval” estimation of these parameters*.
 
@@ -50,105 +49,45 @@ We perform a goodness-of-fit test to check if the variable can be assumed normal
 
 ```{r}
 library(nortest)
-ad.test(TiempoAccesoWeb$Ordenador_Casa)
-cvm.test(TiempoAccesoWeb$Ordenador_Casa)
-lillie.test(TiempoAccesoWeb$Ordenador_Casa)
-pearson.test(TiempoAccesoWeb$Ordenador_Casa)
-sf.test(TiempoAccesoWeb$Ordenador_Casa)
+ad.test(energy)
+cvm.test(energy)
+lillie.test(energy)
+pearson.test(energy)
+sf.test(energy)
 ```
 
-As we see, the histogram with superimposed curve shows a good fit and all p-values are bigger than 0.05 which is the usual level of significance (5%), therefore we cannot reject the hypothesis that the variable is normally distributed.
-
-Assuming that the variable is normal we can proceed by computing the confidence intervals for mean and the variance of the variable `Ordenador_Casa`. If we weren’t able to assume normality we couldn’t proceed to compute both confidence intervals. If the sample size were large enough (>30) we could still use the confidence interval for the mean (why?). In case of small samples and absence of normality, it would be not valid. 
 
 # 2.3 Confidence intervals
 
 To obtain the confidence intervals for the mean, $\mu$, and the variance, $\sigma^2$, we evaluate the following expressions:
 
 * Confidence interval for $\mu$ with known variance:
-\[\bar{x} \mp z_{\alpha/2} \frac{\sigma}{\sqrt{n}},\]
+$\bar{x} \mp z_{\alpha/2} \frac{\sigma}{\sqrt{n}},$
 where $n$ is the sample size, $\sigma$ is the known standard deviation, $z_{\alpha/2}$ is the ($\alpha/2$)-percentil of the standard normal distribution (`qnorm(alpha/2)` in \textsf{R}) and $\bar{x}$ is the sample mean (`mean(x)` in \textsf{R}).
 
  In the example
 
 ```{r}
 alpha = 0.05
-n = length(TiempoAccesoWeb$Ordenador_Casa)
-xmean = mean(TiempoAccesoWeb$Ordenador_Casa)
-xsd = sd(TiempoAccesoWeb$Ordenador_Casa)
+n = length(energy)
+xmean = mean(energy)
+xsd = sd(energy)
 z = qnorm(alpha/2, lower.tail = FALSE)
 LowerLimit = xmean - z * xsd / sqrt(n)
 UpperLimit = xmean + z * xsd / sqrt(n)
 LowerLimit
 UpperLimit
 ```
-
  where we assume that $\sigma$ is known and equals to `sd(TiempoAccesoWeb$Ordenador_Casa)`. 
-
-* Confidence interval for $\mu$ with unknown variance:
-\[\bar{x} \mp t_{n-1,\alpha/2} \frac{s}{\sqrt{n}},\]
-
- where $n$ is the sample size, $s$ is the sample standard deviation (`sd(x)` in \textsf{R}), $\bar{x}$ is the sample mean (`mean(x)` in \textsf{R}) and $t_{n-1,\alpha/2}$ is the ($\alpha/2$)-percentil of the Student's t distribution with `gl`$= n-1$ (`qt(alpha/2, gl = n-1)` in \textsf{R}).
-
-In the example
-
-```{r}
-alpha = 0.05
-n = length(TiempoAccesoWeb$Ordenador_Casa)
-xmean = mean(TiempoAccesoWeb$Ordenador_Casa)
-xsd = sd(TiempoAccesoWeb$Ordenador_Casa)
-t = qt(alpha/2, df = n-1, lower.tail = FALSE)
-LowerLimit = xmean - t * xsd / sqrt(n)
-UpperLimit = xmean + t * xsd / sqrt(n)
-LowerLimit
-UpperLimit
-```
-
-which does not differ much from the previous one because `z` = 1.959964 and `t` = 2.004879. Therefore the mean access time to the webpage from a computer at home is between 5.96 and 6.07 seconds with a confidence level of 95\%.
-
-* Confidence interval for $\sigma^2$:
-\[\frac{(n-1) s^2}{\chi^2_{n-1,1-\alpha/2}}, \ \frac{(n-1) s^2}{\chi^2_{n-1,\alpha/2}},\]
-
-where $s^2$ is the sample variance (`var(x)` in \textsf{R}), and $\chi^2_{n-1,1-\alpha/2}$ and $\chi^2_{n-1,\alpha/2}$ are the ($1-\alpha/2$)- and ($\alpha/2$)-percentil of the $\chi^2$ distribution with `gl`$= n-1$ (`qchisq(1-alpha/2, gl = n-1)` and `qchisq(alpha/2, gl = n-1)` in \textsf{R}), respectively.
-
-In the example
-
-```{r}
-alpha = 0.05
-n = length(TiempoAccesoWeb$Ordenador_Casa)
-s2 = var(TiempoAccesoWeb$Ordenador_Casa)
-chi.lower = qchisq(1-alpha/2, df = n-1)
-chi.upper = qchisq(alpha/2, df = n-1)
-LowerLimit = (n-1) * s2 / chi.lower
-UpperLimit = (n-1) * s2 / chi.upper
-LowerLimit
-UpperLimit
-```
-
-Therefore the variance of the access time to the webpage from a computer at home is between 0.027 and 0.059 seconds$^2$ with a confidence level of 95\%.
-
+ $\mu\in( 632.7611, 689.0832)$
+ 
 \vspace{0.25cm}
-
 The above confidence intervals can be obtained as output of some functions implementing hyphotesis testing:
-
 * Confidence interval for $\mu$ with known variance using `z.test`:
 
 ```{r message=FALSE, warning=FALSE}
 suppressWarnings(library(BSDA))
-z.test(TiempoAccesoWeb$Ordenador_Casa, sigma.x = xsd)$conf.int
-```
-
-* Confidence interval for $\mu$ with unknown variance using `t.test`:
-
-```{r}
-t.test(TiempoAccesoWeb$Ordenador_Casa)$conf.int
-```
-
-* Confidence interval for $\sigma^2$ using `varTest`:
-
-```{r message=FALSE, warning=FALSE}
-suppressWarnings(library(EnvStats))
-varTest(TiempoAccesoWeb$Ordenador_Casa)$conf.int
+z.test(energy, sigma.x = xsd)$conf.int
 ```
 
 
