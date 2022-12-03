@@ -3,9 +3,9 @@ title: "First Delivery Statistics"
 author: "Eduardo Alarcón & Alfonso Pineda"
 date: "`r Sys.Date()`"
 output:
-  pdf_document: default
-  word_document: default
   html_document: default
+  word_document: default
+  pdf_document: default
 editor_options:
   markdown:
     wrap: 72
@@ -69,8 +69,7 @@ SpotifySongs$participants[SpotifySongs$GenderGroup == "Colab"] <- "Colaboration"
 qplot(energy, data=SpotifySongs, geom=c("histogram"), fill=participants, 
       alpha=I(.65), main="Distribution of the participants with respect to the energy", 
       xlab="energy", ylab="Frequency", bins=20)
-#Use bins=num to set the number of intervals
-
+# Use bins=num to set the number of intervals
 ```
 
 ### Boxplot
@@ -149,14 +148,12 @@ cor(loud, SpotifySongs$duration_s)
 cor(loud, energy)
 cor(loud, log10(energy))
 cor(energy, rithm)
-
-#The best correlation found is: Energy & Loudness, with a correlation of 0.8125021
-
+#The best correlation found is: Energy & rithm, with a correlation of 0.8125021
 ```
 
 
 With the previous results, we choose the variable $\underline{rithm}$
-These are the statistical variables of the rithm, as well as the Histogram and Box Plot:
+These are the statistical variables of the $\underline{rithm}$, as well as the Histogram and Box Plot:
 
 ```{r}
 SpotifySongs <- read_excel("songstats.xlsx")
