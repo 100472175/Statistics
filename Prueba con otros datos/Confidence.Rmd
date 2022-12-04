@@ -27,7 +27,8 @@ Before doing any kind of analysis it is useful to first describe the variables o
 
 ```{r message=FALSE, warning=FALSE}
 suppressWarnings(library(summarytools))
-descr(SpotifySongs$energy)
+energy <- SpotifySongs$energy
+descr(energy)
 hist(energy, breaks = seq(100, 1000, 50), 
      probability = TRUE, # histogram has a total area = 1
      xlab = "Energy") 
@@ -89,83 +90,3 @@ The above confidence intervals can be obtained as output of some functions imple
 suppressWarnings(library(BSDA))
 z.test(energy, sigma.x = xsd)$conf.int
 ```
-
-
-# 3. Example 2: Loop execution time
-
-We consider the file `TiempoBucle.xlsx` that contains the durations in seconds of the executions of a Matlab program under different conditions. For each set of conditions we repeated the measurements of the executions 200 times. We want to construct the confidence interval for the population mean and variance of the execution times under the conditions defined for the variable `Estado1`.
-
-## 3.1 Univariate analysis of data
-
-We analyze the execution times contained in the variable `Estado1`. First we read and view the data file. The figure shows the first five observations of this datafile. 
-
-
-```{r, echo = FALSE}
-library(readxl)
-TiempoBucle <- read_excel("TiempoBucle.xlsx")
-```
-
-
-The graphical and numerical analysis is obtained by
-
-```{r message=FALSE, warning=FALSE}
-suppressWarnings(library(summarytools))
-descr(TiempoBucle$Estado1, na.rm = TRUE)
-hist(TiempoBucle$Estado1, 
-     probability = TRUE, # histogram has a total area = 1
-     xlab = "Time of loop") 
-curve(dnorm(x, mean(TiempoBucle$Estado1, na.rm = T), sd(TiempoBucle$Estado1, na.rm = T)), 
-      col="blue", lwd=2, add=TRUE, yaxt="n")
-```
-
-We can observe that the distribution is concentrated around 0,18 seconds and it shows a strong positive symmetry. The variable looks more peaked than a bell, and therefore we conclude that it does not look Normal.
-
-Among the statistics’ values, the sample mean and variance are the “point” estimations of the population mean and variance. That is, we have that in this sample, the “point” estimation of the parameters of interest are $\widehat{\mu} = 0.18$ and $\widehat{\sigma}^2 = 0.01^2$.
-
-
-Our objective is to make an “interval” estimation of these parameters.
-
-# 3.2 Analysis of the Normality of the variable
-
-To construct the confidence intervals we need to check if the variable of interest is normally distributed or not (why?). The histogram above did not look like a normal density function. In addition the values of Skewness and Kurtosis are high that denotes a positive asymmetry and a shape more peaked than a Normal one. The following lines perfoms some normality goodness-of-fit tests:
-
-```{r}
-library(nortest)
-ad.test(TiempoBucle$Estado1)
-cvm.test(TiempoBucle$Estado1)
-lillie.test(TiempoBucle$Estado1)
-pearson.test(TiempoBucle$Estado1)
-sf.test(TiempoBucle$Estado1)
-```
-
-The picture above shows that the fitting is indeed low precise. In addition from previous tests we see that the p-values are practically equal to zero, therefore we have to reject our null hypothesis of normality for the variable `Estado1`.
-
-Since the sample size is large by the Central Limit Theorem we can assume that still the estimator for the population mean (the sample mean) has a normal distribution. Therefore even if the variable `Estado1` is not normal we can still construct a confidence interval for the mean, **but we CANNOT construct a confidence interval for its standard deviation or its variance**.
-
-\newpage
-
-# 3.3 Confidence Intervals
-
-To get the confidence interval for the mean, $\mu$, we will use the output of functions `z.test` and `t.test`
-
-```{r}
-library(BSDA)
-z.test(TiempoBucle$Estado1, sigma.x = sd(TiempoBucle$Estado1, na.rm = T))$conf.int
-t.test(TiempoBucle$Estado1)$conf.int
-```
-
-It should be noted that `z.test` does not work when there are `NA`. So, we should remove the NA using the function `na.exclude`
-
-```{r}
-library(BSDA)
-z.test(na.exclude(TiempoBucle$Estado1), sigma.x = sd(TiempoBucle$Estado1, na.rm = T))$conf.int
-t.test(TiempoBucle$Estado1)$conf.int
-```
-
-Both intervals are very similar since the sample size is 200, then  $z_\alpha \approx t_{n-1, \alpha}$. 
-
-
-Therefore the mean execution time of the Matlab program under the conditions used for the variable `Estado1` is a value contained in the interval [0.1799897, 0.1814403] seconds with a confidence level of 95%. Since the distribution of the random variable is not Normal, the confidence interval for the variance is not reliable and therefore we did not calculate it.
-
-
-
